@@ -34,5 +34,16 @@
     "vite": "^7.0.4",
     "vite-plugin-svgr": "^4.5.0",
     "@tauri-apps/cli": "^2"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core",
+      "core-js",
+      "es5-ext",
+      "esbuild",
+      "unrs-resolver"
+    ]
   }
 }
