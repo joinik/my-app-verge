@@ -32,3 +32,7 @@ pub fn get_system_info() -> Result<serde_json::Value, String> {
         "interface": interface_json,
     }))
 }
+
+
+
+

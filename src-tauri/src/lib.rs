@@ -33,6 +33,9 @@ mod app_init {
     pub fn generate_handlers() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
         tauri::generate_handler![
             cmd::greet,
+            cmd::system::get_system_hostname,
+            cmd::system::get_network_interface,
+            cmd::system::get_system_info,
         ]
     }
 }
