@@ -1,4 +1,4 @@
-import { useVerge } from '@/hooks/UseVerge'
+import { useVerge } from '@/hooks/useVerge'
 import { DraggableAttributes, DraggableSyntheticListeners } from '@dnd-kit/core'
 import {
   alpha,

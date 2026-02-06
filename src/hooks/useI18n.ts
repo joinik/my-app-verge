@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { useVerge } from './UseVerge'
+import { useVerge } from './useVerge'
 import { useCallback, useState } from 'react'
 import {
   resolveLanguage,
@@ -10,7 +10,7 @@ import {
 export const useI18n = () => {
   const { i18n, t } = useTranslation()
   const { patchVerge } = useVerge()
-  const { isLoading, setIsLoading } = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const switchLanguage = useCallback(
     async (language: string) => {
       const targetLanguage = resolveLanguage(language)
