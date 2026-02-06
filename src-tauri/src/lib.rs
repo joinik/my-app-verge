@@ -57,7 +57,7 @@ pub fn run() {
         std::process::exit(1);
     });
 
-    app.run(|app_handle, e| match e {
+    app.run(|_app_handle, e| match e {
         tauri::RunEvent::Ready | tauri::RunEvent::Resumed => {
             println!("Application ready");
         }
