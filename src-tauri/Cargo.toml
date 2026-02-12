@@ -1,7 +1,7 @@
 [package]
 name = "my-new-app"
 version = "0.1.0"
-description = "A Tauri App"
+description = "my new clash"
 authors = ["you"]
 license = "GPL-3.0-only"
 build = "build.rs"
@@ -24,7 +24,6 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 tauri = { workspace = true, features = [
   "devtools",
-  
   "tray-icon",
   "image-ico",
   "image-png",
