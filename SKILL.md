@@ -82,32 +82,33 @@ tempfile = "3.0"
 ```
 
 ### 步骤 2：创建配置目录结构
+
 src-tauri/src/
 ├── config/
-│   ├── mod.rs              # 配置模块入口
-│   ├── clash.rs            # Clash 核心配置
-│   ├── config.rs           # 应用配置
-│   ├── encrypt.rs          # 加密工具
-│   ├── prfitem.rs          # 代理/规则项
-│   └── profiles.rs         # 配置文件管理
-├── core/                   # 核心功能
-│   ├── mod.rs
-│   ├── manager.rs          # 进程管理
-│   └── handle.rs           # 全局句柄
-├── cmd/                    # Tauri 命令
-│   ├── mod.rs
-│   ├── app.rs              # 应用命令
-│   ├── system.rs          # 系统命令
-│   ├── clash.rs            # Clash 命令
-│   ├── proxy.rs            # 代理命令
-│   └── profile.rs          # 配置命令
-├── utils/                  # 工具函数
-│   ├── mod.rs
-│   ├── dirs.rs             # 目录操作
-│   └── logging.rs          # 日志系统
-├── constants.rs            # 常量定义
-├── lib.rs                  # 库入口
-└── main.rs                 # 主程序入口
+│ ├── mod.rs # 配置模块入口
+│ ├── clash.rs # Clash 核心配置
+│ ├── config.rs # 应用配置
+│ ├── encrypt.rs # 加密工具
+│ ├── prfitem.rs # 代理/规则项
+│ └── profiles.rs # 配置文件管理
+├── core/ # 核心功能
+│ ├── mod.rs
+│ ├── manager.rs # 进程管理
+│ └── handle.rs # 全局句柄
+├── cmd/ # Tauri 命令
+│ ├── mod.rs
+│ ├── app.rs # 应用命令
+│ ├── system.rs # 系统命令
+│ ├── clash.rs # Clash 命令
+│ ├── proxy.rs # 代理命令
+│ └── profile.rs # 配置命令
+├── utils/ # 工具函数
+│ ├── mod.rs
+│ ├── dirs.rs # 目录操作
+│ └── logging.rs # 日志系统
+├── constants.rs # 常量定义
+├── lib.rs # 库入口
+└── main.rs # 主程序入口
 
 ### 步骤 3：实现配置模块
 
@@ -258,6 +259,7 @@ impl ClashConfig {
                 .context("Failed to parse Clash config file")?;
 
             config.data.store(Arc::new(data));
+            // 这里错误 ，todo fix
             config.last_update = Some(
                 std::fs::metadata(&config.path)
                     .map(|meta| {
@@ -273,7 +275,7 @@ impl ClashConfig {
     }
 
     /// 保存配置到文件
-    pub async fn save(&self) -> Result<()> {
+    pub async fn save(&mut self) -> Result<()> {
         // 确保目录存在
         if let Some(parent) = self.path.parent() {
             tokio::fs::create_dir_all(parent)
@@ -281,7 +283,7 @@ impl ClashConfig {
                 .context("Failed to create config directory")?;
         }
 
-        let data = self.data.load();
+        let data = self.data.load_full();
         let content = serde_yaml_ng::to_string(&data)
             .context("Failed to serialize Clash config")?;
 
@@ -765,7 +767,7 @@ impl Profiles {
     /// 更新配置
     pub fn update(&self, id: &str, new_profile: Profile) -> Result<()> {
         let mut data = (*self.data.load()).clone();
-        
+
         if let Some(index) = data.items.iter().position(|p| p.id == id) {
             data.items[index] = new_profile;
             self.data.store(Arc::new(data));
@@ -778,11 +780,11 @@ impl Profiles {
     /// 删除配置
     pub fn delete(&self, id: &str) -> Result<()> {
         let mut data = (*self.data.load()).clone();
-        
+
         let index = data.items.iter()
             .position(|p| p.id == id)
             .ok_or_else(|| anyhow::anyhow!("Profile not found: {}", id))?;
-        
+
         // 删除关联的文件
         if let Some(profile) = data.items.get(index) {
             if profile.file.exists() {
@@ -791,14 +793,14 @@ impl Profiles {
                     .context("Failed to delete profile file")?;
             }
         }
-        
+
         data.items.remove(index);
-        
+
         // 如果删除的是当前配置，清除当前配置选择
         if data.current.as_ref() == Some(&id.to_string()) {
             data.current = None;
         }
-        
+
         self.data.store(Arc::new(data));
         Ok(())
     }
@@ -806,11 +808,11 @@ impl Profiles {
     /// 设置当前配置
     pub fn set_current(&self, id: &str) -> Result<()> {
         let mut data = (*self.data.load()).clone();
-        
+
         if !data.items.iter().any(|p| p.id == id) {
             anyhow::bail!("Profile not found: {}", id);
         }
-        
+
         data.current = Some(id.to_string());
         self.data.store(Arc::new(data));
         Ok(())
@@ -820,22 +822,22 @@ impl Profiles {
     pub async fn create_profile(&self, name: &str, content: &str) -> Result<Profile> {
         let id = nanoid!();
         let timestamp = Local::now().timestamp_millis() as u64;
-        
+
         // 确保目录存在
         let profiles_dir = self.get_profiles_dir();
         tokio::fs::create_dir_all(&profiles_dir)
             .await
             .context("Failed to create profiles directory")?;
-        
+
         // 生成文件路径
         let file_name = format!("{}_{}.yaml", timestamp, nanoid!(6));
         let file_path = profiles_dir.join(&file_name);
-        
+
         // 写入文件内容
         tokio::fs::write(&file_path, content)
             .await
             .context("Failed to write profile file")?;
-        
+
         let profile = Profile {
             id: id.clone(),
             name: name.to_string(),
@@ -847,7 +849,7 @@ impl Profiles {
             order: None,
             extra: ProfileExtra::default(),
         };
-        
+
         self.add(profile.clone());
         Ok(profile)
     }
@@ -862,7 +864,7 @@ impl Profiles {
     /// 更新配置流量信息
     pub fn update_traffic(&self, id: &str, upload: u64, download: u64) -> Result<()> {
         let mut data = (*self.data.load()).clone();
-        
+
         if let Some(profile) = data.items.iter_mut().find(|p| p.id == id) {
             profile.extra.upload = Some(upload);
             profile.extra.download = Some(download);
@@ -876,7 +878,7 @@ impl Profiles {
     /// 重新排序配置
     pub fn reorder(&self, ids: &[String]) -> Result<()> {
         let mut data = (*self.data.load()).clone();
-        
+
         let mut new_items = Vec::with_capacity(ids.len());
         for id in ids {
             if let Some(profile) = data.items.iter().find(|p| p.id == *id) {
@@ -885,7 +887,7 @@ impl Profiles {
                 anyhow::bail!("Profile not found: {}", id);
             }
         }
-        
+
         data.items = new_items;
         self.data.store(Arc::new(data));
         Ok(())
@@ -926,7 +928,7 @@ mod tests {
     #[tokio::test]
     async fn test_add_profile() {
         let profiles = Profiles::new();
-        
+
         let profile = Profile {
             id: "test-1".to_string(),
             name: "Test Profile".to_string(),
@@ -938,9 +940,9 @@ mod tests {
             order: None,
             extra: ProfileExtra::default(),
         };
-        
+
         profiles.add(profile.clone());
-        
+
         assert_eq!(profiles.get_all().len(), 1);
         assert_eq!(profiles.get_by_id("test-1"), Some(profile));
     }
@@ -948,7 +950,7 @@ mod tests {
     #[tokio::test]
     async fn test_delete_profile() {
         let profiles = Profiles::new();
-        
+
         let profile = Profile {
             id: "test-2".to_string(),
             name: "Test Profile".to_string(),
@@ -960,10 +962,10 @@ mod tests {
             order: None,
             extra: ProfileExtra::default(),
         };
-        
+
         profiles.add(profile.clone());
         profiles.delete("test-2").unwrap();
-        
+
         assert!(profiles.get_all().is_empty());
     }
 }
@@ -1311,7 +1313,7 @@ impl CoreManager {
         if let Some(child_arc) = child {
             let mut child = Arc::try_unwrap(child_arc)
                 .map_err(|_| anyhow::anyhow!("Failed to unwrap child process"))?;
-            
+
             child.kill().await.context("Failed to kill Clash core")?;
             child.wait().await.context("Failed to wait for Clash core")?;
         }
@@ -1478,7 +1480,7 @@ pub async fn open_dir(path: String) -> Result<(), String> {
     {
         use std::os::windows::process::CommandExt;
         use winapi::um::winbase::CREATE_NO_WINDOW;
-        
+
         Command::new("explorer.exe")
             .args(&[path.to_str().unwrap_or("")])
             .creation_flags(CREATE_NO_WINDOW)
@@ -1511,7 +1513,7 @@ pub async fn get_system_info() -> Result<SystemInfo, String> {
         use sysinfo::{System, SystemExt};
         let mut sys = System::new_all();
         sys.refresh_all();
-        
+
         Ok(SystemInfo {
             os_name: sysinfo::System::name().unwrap_or_else(|| "Unknown".into()),
             os_version: sysinfo::System::os_version().unwrap_or_else(|| "Unknown".into()),
@@ -1554,7 +1556,7 @@ use std::path::PathBuf;
 
 pub fn init_logger() -> Result<(), flexi_logger::FlexiLoggerError> {
     let log_path = get_log_dir();
-    
+
     let log_spec = LogSpec::default()
         .default_filter_level(log::LevelFilter::Info);
 
@@ -1600,13 +1602,13 @@ mod tests {
     async fn test_clash_config_load_save() {
         let temp_dir = tempfile::tempdir().unwrap();
         let config_path = temp_dir.path().join("config.yaml");
-        
+
         let mut config = ClashConfig::new();
         config.set_mixed_port(8080);
-        
+
         // 保存配置
         config.save().await.unwrap();
-        
+
         // 重新加载
         let loaded = ClashConfig::load().await.unwrap();
         assert_eq!(loaded.get_mixed_port(), 8080);
@@ -1615,7 +1617,7 @@ mod tests {
     #[tokio::test]
     async fn test_profile_operations() {
         let profiles = Profiles::new();
-        
+
         let profile = Profile {
             id: "test".to_string(),
             name: "Test".to_string(),
@@ -1627,10 +1629,10 @@ mod tests {
             order: None,
             extra: ProfileExtra::default(),
         };
-        
+
         profiles.add(profile.clone());
         assert_eq!(profiles.get_all().len(), 1);
-        
+
         profiles.delete("test").unwrap();
         assert!(profiles.get_all().is_empty());
     }
@@ -1640,16 +1642,19 @@ mod tests {
 ## 性能优化
 
 ### 1. 配置加载优化
+
 - 使用 ArcSwap 避免不必要的锁竞争
 - 延迟加载非必要配置
 - 批量保存减少 I/O 操作
 
 ### 2. 内存使用优化
+
 - 使用 Arc 共享配置数据
 - 避免不必要的克隆
 - 使用智能指针管理生命周期
 
 ### 3. 异步处理
+
 - 使用 tokio 进行异步 I/O
 - 实现后台任务处理
 - 使用 channel 进行进程间通信
@@ -1657,17 +1662,21 @@ mod tests {
 ## 常见问题
 
 ### Q1: 配置加载失败怎么办？
+
 A1: 检查配置文件路径和格式，使用默认配置作为回退。
 
 ### Q2: 如何处理配置文件冲突？
+
 A2: 实现文件锁机制，避免并发写入。
 
 ### Q3: 内存占用过高如何优化？
+
 A3: 使用 ArcSwap 减少内存复制，及时释放不需要的资源。
 
 ## 下一步计划
 
 完成当前阶段后，我们将继续实现：
+
 1. **阶段 2**: Clash 核心管理（进程控制、生命周期）
 2. **阶段 3**: 代理和规则管理
 3. **阶段 4**: 系统集成（系统代理、TUN）
