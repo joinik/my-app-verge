@@ -4,10 +4,11 @@ use std::sync::Arc;
 
 mod clash;
 mod verge;
+mod profiles;
 
 pub use clash::ClashConfig;
 pub use verge::VERGE_CONFIG;
-pub use verge::{VergeConfigData, init_config as init_verge_config, load_config};
+pub use verge::load_config;
 
 pub const DEFAULT_PAC: &str = r#"function FindProxyForURL(url, host) {
   return "PROXY 127.0.0.1:%mixed-port%; SOCKS5 127.0.0.1:%mixed-port%; DIRECT;";
