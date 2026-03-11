@@ -5,6 +5,7 @@ use std::sync::Arc;
 mod clash;
 mod verge;
 mod profiles;
+mod encrypt;
 
 pub use clash::ClashConfig;
 pub use verge::VERGE_CONFIG;

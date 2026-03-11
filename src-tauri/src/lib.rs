@@ -73,9 +73,4 @@
 //         _ => {}
 //     });
 // }
-
 mod config;
-
-pub fn run() {
-    println!("Application starting...");
-}
