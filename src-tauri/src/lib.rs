@@ -1,8 +1,8 @@
 // // #![allow(non_snake_case)]
 // // #![recursion_limit = "512"]
 
-// mod cmd;
-// mod constants;
+mod cmd;
+mod constants;
 
 // use once_cell::sync::OnceCell;
 // use tauri::{AppHandle, Manager as _};
