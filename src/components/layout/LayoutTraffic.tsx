@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { LightweightTrafficErrorBoundary } from "@/components/shared/traffic-error-boundary";
 import { useMemoryData } from "@/hooks/use-memory-data";
 import { useTrafficData } from "@/hooks/use-traffic-data";
-import { useVerge } from "@/hooks/use-verge";
+import { useVerge } from "@/hooks/useVerge";
 import { useVisibility } from "@/hooks/use-visibility";
 import parseTraffic from "@/utils/parse-traffic";
 
@@ -91,7 +91,6 @@ export const LayoutTraffic = () => {
             {...boxStyle}
             sx={{
               ...boxStyle.sx,
-              // opacity: traffic?.is_fresh ? 1 : 0.6,
             }}
           >
             <ArrowUpwardRounded
@@ -109,7 +108,6 @@ export const LayoutTraffic = () => {
             {...boxStyle}
             sx={{
               ...boxStyle.sx,
-              // opacity: traffic?.is_fresh ? 1 : 0.6,
             }}
           >
             <ArrowDownwardRounded
@@ -128,12 +126,8 @@ export const LayoutTraffic = () => {
               {...boxStyle}
               sx={{
                 cursor: "auto",
-                // opacity: memory?.is_fresh ? 1 : 0.6,
               }}
               color={"disabled"}
-              onClick={async () => {
-                // isDebug && (await gc());
-              }}
             >
               <MemoryRounded {...iconStyle} />
               <Typography {...valStyle}>{inuse}</Typography>

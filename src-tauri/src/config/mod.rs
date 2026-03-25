@@ -9,28 +9,30 @@ pub mod prfitem;
 pub mod profiles;
 pub mod verge;
 
+#[allow(unused_imports)]
 pub use self::{
     clash::ClashConfig,
-    config::VergeConfig,
-    encrypt::{decrypt, encrypt},
-    prfitem::{ProxyItem, RuleItem},
-    profiles::{Profiles, ProfilesExt},
+    profiles::Profiles,
     verge::{AppConfig, VergeConfigData},
 };
 
+#[allow(dead_code)]
 pub const DEFAULT_PAC: &str = r#"function FindProxyForURL(url, host) {
   return "PROXY 127.0.0.1:%mixed-port%; SOCKS5 127.0.0.1:%mixed-port%; DIRECT;";
 }
 "#;
 
 /// 全局 Clash 配置实例
+#[allow(dead_code)]
 pub static CLASH_CONFIG: Lazy<ArcSwap<clash::ClashConfig>> =
     Lazy::new(|| ArcSwap::new(Arc::new(clash::ClashConfig::new())));
 
 /// 全局 Verge 应用配置实例
+#[allow(dead_code)]
 pub static APP_CONFIG: Lazy<ArcSwap<AppConfig>> = Lazy::new(|| ArcSwap::new(Arc::new(AppConfig::new())));
 
 /// 初始化所有配置
+#[allow(dead_code)]
 pub async fn init_config() -> anyhow::Result<()> {
     // 初始化 Clash 配置
     let clash_config = clash::ClashConfig::load().await?;

@@ -6,10 +6,12 @@ use chrono::{DateTime, Local};
 use serde::{Deserialize, Serialize};
 use serde_yaml_ng::Value as YamlValue;
 
+#[allow(dead_code)]
 const CLASH_CONFIG_FILE: &str = "config.yaml";
 
 /// Clash 核心配置结构
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct ClashConfigData {
     /// 混合端口
     pub mixed_port: Option<u16>,
@@ -37,6 +39,7 @@ pub struct ClashConfigData {
 
 /// DNS 配置
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct DnsConfig {
     pub enable: Option<bool>,
     pub nameserver: Option<Vec<String>>,
@@ -47,6 +50,7 @@ pub struct DnsConfig {
 
 /// Clash 配置管理器
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct ClashConfig {
     /// 配置数据
     data: ArcSwap<ClashConfigData>,
@@ -57,6 +61,7 @@ pub struct ClashConfig {
 }
 
 impl ClashConfig {
+    #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
             data: ArcSwap::new(Arc::new(ClashConfigData::default())),
@@ -90,6 +95,7 @@ impl ClashConfig {
         Ok(config)
     }
 
+    #[allow(dead_code)]
     pub async fn save(&mut self) -> anyhow::Result<()> {
         if let Some(parent) = self.path.parent() {
             tokio::fs::create_dir_all(parent)
@@ -108,21 +114,25 @@ impl ClashConfig {
     }
 
     /// 获取当前配置
+    #[allow(dead_code)]
     pub fn get(&self) -> Arc<ClashConfigData> {
         self.data.load().clone()
     }
 
     /// 更新配置
+    #[allow(dead_code)]
     pub fn patch(&self, new_config: ClashConfigData) {
         self.data.store(Arc::new(new_config));
     }
 
     /// 获取混合端口
+    #[allow(dead_code)]
     pub fn get_mixed_port(&self) -> u16 {
         self.data.load().mixed_port.unwrap_or(7890)
     }
 
     /// 设置混合端口
+    #[allow(dead_code)]
     pub fn set_mixed_port(&self, port: u16) {
         let mut data = (*self.data.load_full()).clone();
         data.mixed_port = Some(port);
@@ -130,6 +140,7 @@ impl ClashConfig {
     }
 
     /// 获取外部控制器地址
+    #[allow(dead_code)]
     pub fn get_external_controller(&self) -> String {
         self.data
             .load()
@@ -139,11 +150,13 @@ impl ClashConfig {
     }
 
     /// 检查是否允许局域网
+    #[allow(dead_code)]
     pub fn is_allow_lan(&self) -> bool {
         self.data.load().allow_lan.unwrap_or(false)
     }
 
     /// 获取日志级别
+    #[allow(dead_code)]
     pub fn get_log_level(&self) -> String {
         self.data.load().log_level.clone().unwrap_or_else(|| "info".to_string())
     }

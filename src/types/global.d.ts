@@ -3,6 +3,15 @@
  */
 declare const OS_PLATFORM: Platform
 
+/**
+ * Tauri global window object
+ */
+interface Window {
+  __TAURI__?: {
+    invoke: <T>(cmd: string, args?: Record<string, unknown>) => Promise<T>;
+  };
+}
+
 interface IVergeConfig {
   app_log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | string
   app_log_max_size?: number // KB

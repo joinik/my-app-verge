@@ -1,6 +1,9 @@
+use serde::{Deserialize, Serialize};
+
 /// 代理类型
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
+#[allow(dead_code)]
 pub enum ProxyType {
     Http,
     Https,
@@ -15,6 +18,7 @@ pub enum ProxyType {
 }
 /// 单个代理配置
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)]
 pub struct ProxyItem {
     /// 代理名称
     pub name: String,
@@ -46,6 +50,7 @@ pub struct ProxyItem {
 /// 路由规则类型
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
+#[allow(dead_code)]
 pub enum RuleType {
     Domain,
     DomainSuffix,
@@ -58,6 +63,7 @@ pub enum RuleType {
 
 /// 单个路由规则配置
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)]
 pub struct RuleItem {
     /// 路由规则类型
     #[serde(rename = "type")]
@@ -74,6 +80,7 @@ pub struct RuleItem {
 
 /// 规则集
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)]
 pub struct RuleSet {
     pub name: String,
     pub type_: String,
@@ -85,6 +92,7 @@ pub struct RuleSet {
 /// 代理分组类型
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
+#[allow(dead_code)]
 pub enum ProxyGroupType {
     Select,
     UrlTest,
@@ -95,6 +103,7 @@ pub enum ProxyGroupType {
 
 /// 代理分组配置
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)]
 pub struct ProxyGroup {
     pub name: String,
     /// 代理分组类型

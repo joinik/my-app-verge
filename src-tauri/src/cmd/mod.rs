@@ -1,19 +1,16 @@
 use anyhow::Result;
 use smartstring::alias::String as SmartString;
+#[allow(dead_code)]
 pub type CmdResult<T = ()> = Result<T, SmartString>;
 
 pub mod app;
-pub mod clash;
-pub mod profile;
-pub mod proxy;
 pub mod system;
 
 pub use app::*;
-pub use clash::*;
-pub use profile::*;
-pub use proxy::*;
+#[allow(unused_imports)]
 pub use system::*;
 
+#[allow(dead_code)]
 pub trait StringifyErr<T> {
     fn stringify_err(self) -> CmdResult<T>;
     fn stringify_err_log<F>(self, log_fn: F) -> CmdResult<T>

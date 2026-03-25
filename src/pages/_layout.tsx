@@ -1,8 +1,3 @@
-import { useTranslation } from "react-i18next";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
-import { LayoutItem } from "@/components/LayoutItem";
-import { navItems } from "./_routers";
 import {
   DndContext,
   KeyboardSensor,
@@ -18,6 +13,19 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
+  Box,
+  List,
+  Menu,
+  MenuItem,
+  Paper,
+  SvgIcon,
+  ThemeProvider,
+} from "@mui/material";
+
+import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -25,11 +33,22 @@ import {
   useState,
   type CSSProperties,
 } from "react";
+import { Outlet, useNavigate } from "react-router";
+import { SWRConfig } from "swr";
+
+import iconDark from "@/assets/image/icon_dark.svg?react";
+import iconLight from "@/assets/image/icon_light.svg?react";
+import LogoSvg from "@/assets/image/logo.svg?react";
+import { BaseErrorBoundary } from "@/components/base";
+import { LayoutItem } from "@/components/LayoutItem";
+import { navItems } from "./_routers";
+
+
+
 import getSystem from "@/utils/get-system";
 import { useThemeMode } from "@/services/states";
 import { useVerge } from "@/hooks/useVerge";
 import { useI18n } from "@/hooks/useI18n";
-import { Outlet, useNavigate } from "react-router";
 import { useWindowDecorations } from "@/hooks/useWindow";
 import { WindowControls } from "@/components/layout/WindowController";
 
@@ -41,20 +60,8 @@ import {
 } from "./_layout/hooks";
 import { handleNoticeMessage } from "./_layout/utils/notification-handlers";
 import { useLayoutEvents } from "./_layout/hooks/useLayoutEvents";
-import { SWRConfig } from "swr";
-import {
-  Box,
-  List,
-  Menu,
-  MenuItem,
-  Paper,
-  SvgIcon,
-  ThemeProvider,
-} from "@mui/material";
+
 import { NoticeManager } from "@/components/layout/NoticeManager";
-import iconDark from "@/assets/image/icon_dark.svg?react";
-import iconLight from "@/assets/image/icon_light.svg?react";
-import LogoSvg from "@/assets/image/logo.svg?react";
 import { UpdateButton } from "@/components/layout/UpdateButton";
 export const portableFlag = false;
 

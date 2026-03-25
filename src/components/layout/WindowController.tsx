@@ -4,7 +4,7 @@ import getSystem from "@/utils/get-system";
 import { Box, IconButton } from "@mui/material";
 import { forwardRef, useImperativeHandle } from "react";
 
-export const WindowControls = forwardRef(function WindowControls(props, ref) {
+export const WindowControls = forwardRef(function WindowControls(_props, ref) {
   const OS = getSystem();
   const {
     currentWindow,

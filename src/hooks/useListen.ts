@@ -1,12 +1,19 @@
 import { event } from "@tauri-apps/api";
 import { listen, UnlistenFn, EventCallback } from "@tauri-apps/api/event";
 import { useCallback, useRef } from "react";
+import { isTauri } from "@/utils/tauri-env";
 
 export const useListen = () => {
   const unlistenFns = useRef<UnlistenFn[]>([]);
 
   const addListener = useCallback(
     async <T>(eventName: string, handler: EventCallback<T>) => {
+      if (!isTauri()) {
+        console.warn(
+          "[useListen] addListener called outside of Tauri environment",
+        );
+        return () => {}; // 返回空函数
+      }
       const unlisten = await listen(eventName, handler);
       unlistenFns.current.push(unlisten);
       return unlisten;

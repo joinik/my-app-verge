@@ -1,11 +1,20 @@
 import { invoke } from "@tauri-apps/api/core";
 import { useEffect, useRef } from "react";
 import { hideInitialOverlay } from "../utils";
+import { isTauri } from "@/utils/tauri-env";
 
 export const useAppInitialization = () => {
   const initRef = useRef(false);
 
   useEffect(() => {
+    // 非 Tauri 环境下不执行初始化
+    if (!isTauri()) {
+      console.warn(
+        "[useAppInitialization] called outside of Tauri environment",
+      );
+      return;
+    }
+
     if (initRef.current) return;
     initRef.current = true;
 
@@ -27,6 +36,7 @@ export const useAppInitialization = () => {
     };
 
     const notifyBackend = async (stage?: string) => {
+      if (!isTauri()) return; // 非 Tauri 环境直接返回
       try {
         if (stage) {
           await invoke("update_ui_stage", { stage });

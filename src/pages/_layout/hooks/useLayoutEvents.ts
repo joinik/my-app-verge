@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { mutate } from "swr";
 
 import { useListen } from "@/hooks/useListen";
+import { isTauri } from "@/utils/tauri-env";
 
 export const useLayoutEvents = (
   handleNotice: (payload: [string, string]) => void,
@@ -11,6 +12,11 @@ export const useLayoutEvents = (
   const { addListener } = useListen();
 
   useEffect(() => {
+    // 非 Tauri 环境下不执行任何操作
+    if (!isTauri()) {
+      return;
+    }
+
     const unlisteners: Array<() => void> = [];
     let disposed = false;
     const revalidateKeys = (keys: readonly string[]) => {

@@ -38,7 +38,7 @@ export const LayoutItem = (props: Props) => {
   const effectiveMenuIcon =
     navCollapsed && menu_icon === 'disable' ? 'monochrome' : menu_icon
 
-  const { setNodeRef, attributes, listeners, style, isDragging, disabled } =
+  const { setNodeRef, attributes, listeners, style, disabled } =
     sortable ?? {}
 
   const draggable = Boolean(sortable) && !disabled

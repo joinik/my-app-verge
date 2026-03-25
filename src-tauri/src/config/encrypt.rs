@@ -3,10 +3,10 @@ use aes_gcm::{Aes256Gcm, Nonce};
 use anyhow::Result;
 use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64_ENGINE};
 
-use futures::future::err;
 use rand::Rng;
 
 /// 使用 AES-256-GCM 加密数据
+#[allow(dead_code)]
 pub fn encrypt(data: &str, key: &str) -> Result<String> {
     // 生成随机密钥
     let key_bytes = key.as_bytes();
@@ -30,6 +30,7 @@ pub fn encrypt(data: &str, key: &str) -> Result<String> {
 }
 
 /// 使用 AES-256-GCM 解密数据
+#[allow(dead_code)]
 pub fn decrypt(encrypted: &str, key: &str) -> Result<String> {
     // 解码 Base64
     let parts: Vec<&str> = encrypted.split(':').collect();
@@ -57,6 +58,7 @@ pub fn decrypt(encrypted: &str, key: &str) -> Result<String> {
 }
 
 /// 生成随机 32 字节密钥（Base64 编码）
+#[allow(dead_code)]
 pub fn generate_key(length: usize) -> String {
     const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 

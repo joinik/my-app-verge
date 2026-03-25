@@ -8,6 +8,7 @@ const VERGE_CONFIG_FILE: &str = "verge.yaml";
 
 /// Verge 应用配置数据
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct VergeConfigData {
     /// 主题模式：light, dark, system
     pub theme_mode: Option<String>,
@@ -54,7 +55,7 @@ pub struct VergeConfigData {
 }
 
 /// Verge 应用配置管理器
-#[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct AppConfig {
     /// 配置数据
     data: ArcSwap<VergeConfigData>,
@@ -62,6 +63,16 @@ pub struct AppConfig {
     path: PathBuf,
     /// 最后修改时间
     pub last_update: Option<DateTime<Local>>,
+}
+
+impl Clone for AppConfig {
+    fn clone(&self) -> Self {
+        Self {
+            data: ArcSwap::new(self.data.load().clone()),
+            path: self.path.clone(),
+            last_update: self.last_update.clone(),
+        }
+    }
 }
 
 impl AppConfig {
@@ -84,6 +95,7 @@ impl AppConfig {
 
     /// 从文件加载配置
     pub async fn load() -> Result<Self> {
+        #[allow(unused_mut)]
         let mut config = Self::new();
 
         if config.path.exists() {
@@ -120,6 +132,7 @@ impl AppConfig {
     }
 
     /// 获取当前配置
+    #[allow(dead_code)]
     pub fn get(&self) -> Arc<VergeConfigData> {
         self.data.load().clone()
     }
@@ -130,6 +143,7 @@ impl AppConfig {
     }
 
     /// 获取主题模式
+    #[allow(dead_code)]
     pub fn get_theme_mode(&self) -> String {
         self.data
             .load()
@@ -139,42 +153,53 @@ impl AppConfig {
     }
 
     /// 设置主题模式
+    #[allow(dead_code)]
     pub fn set_theme_mode(&self, mode: &str) {
-        let mut data = (*self.data.load()).clone();
-        data.theme_mode = Some(mode.to_string());
-        self.data.store(Arc::new(data));
+        self.data.rcu(|old_data_arc| {
+            let mut new_data = (**old_data_arc).clone();
+            new_data.theme_mode = Some(mode.to_string());
+            Arc::new(new_data)
+        });
     }
 
     /// 是否启用系统代理
+    #[allow(dead_code)]
     pub fn is_system_proxy_enabled(&self) -> bool {
         self.data.load().enable_system_proxy.unwrap_or(false)
     }
 
     /// 是否启用 TUN 模式
+    #[allow(dead_code)]
     pub fn is_tun_mode_enabled(&self) -> bool {
         self.data.load().enable_tun_mode.unwrap_or(false)
     }
 
     /// 是否启用自动启动
+    #[allow(dead_code)]
     pub fn is_auto_launch_enabled(&self) -> bool {
         self.data.load().enable_auto_launch.unwrap_or(false)
     }
 
     /// 是否启用全局热键
+    #[allow(dead_code)]
     pub fn is_global_hotkey_enabled(&self) -> bool {
         self.data.load().enable_global_hotkey.unwrap_or(true)
     }
 
     /// 获取 Clash 核心路径
+    #[allow(dead_code)]
     pub fn get_clash_core_path(&self) -> Option<String> {
         self.data.load().clash_core_path.clone()
     }
 
     /// 设置 Clash 核心路径
+    #[allow(dead_code)]
     pub fn set_clash_core_path(&self, path: &str) {
-        let mut data = (*self.data.load()).clone();
-        data.clash_core_path = Some(path.to_string());
-        self.data.store(Arc::new(data));
+        self.data.rcu(|old_data_arc| {
+            let mut new_data = (**old_data_arc).clone();
+            new_data.clash_core_path = Some(path.to_string());
+            Arc::new(new_data)
+        });
     }
 }
 
