@@ -12,4 +12,5 @@ scripts/_env.sh
 .old
 .eslintcache
 .changelog_backups
+.qwen
 target

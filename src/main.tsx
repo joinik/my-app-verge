@@ -11,7 +11,7 @@ import {
   UpdateStateProvider,
 } from "./services/states";
 import { WindowProvider } from "@/providers/window";
-
+import "./assets/styles/index.scss";
 const AppContent = () => <RouterProvider router={router} />;
 
 const contexts: React.ReactElement<

@@ -17,8 +17,8 @@ export const BaseErrorBoundary = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
+}) => {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>{children}</ErrorBoundary>
   );
-}
+};

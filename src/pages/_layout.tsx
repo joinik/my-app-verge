@@ -41,16 +41,16 @@ import iconLight from "@/assets/image/icon_light.svg?react";
 import LogoSvg from "@/assets/image/logo.svg?react";
 import { BaseErrorBoundary } from "@/components/base";
 import { LayoutItem } from "@/components/LayoutItem";
-import { navItems } from "./_routers";
-
-
+import { LayoutTraffic } from "@/components/layout/layout-traffic";
+import { NoticeManager } from "@/components/layout/notice-manager";
+import { UpdateButton } from "@/components/layout/update-button";
+import { WindowControls } from "@/components/layout/window-controller";
+import { useI18n } from "@/hooks/useI18n";
+import { useVerge } from "@/hooks/useVerge";
+import { useWindowDecorations } from "@/hooks/useWindow";
+import { useThemeMode } from "@/services/states";
 
 import getSystem from "@/utils/get-system";
-import { useThemeMode } from "@/services/states";
-import { useVerge } from "@/hooks/useVerge";
-import { useI18n } from "@/hooks/useI18n";
-import { useWindowDecorations } from "@/hooks/useWindow";
-import { WindowControls } from "@/components/layout/WindowController";
 
 import {
   useAppInitialization,
@@ -59,10 +59,11 @@ import {
   useNavMenuOrder,
 } from "./_layout/hooks";
 import { handleNoticeMessage } from "./_layout/utils/notification-handlers";
+import { navItems } from "./_routers";
+import "dayjs/locale/ru";
+import "dayjs/locale/zh-cn";
 import { useLayoutEvents } from "./_layout/hooks/useLayoutEvents";
 
-import { NoticeManager } from "@/components/layout/NoticeManager";
-import { UpdateButton } from "@/components/layout/UpdateButton";
 export const portableFlag = false;
 
 type NavItem = (typeof navItems)[number];
@@ -138,12 +139,15 @@ const Layout = () => {
   const windowControls = useRef<any>(null);
   const { decorated } = useWindowDecorations();
 
+  // 配置 dnd-kit 的传感器，支持鼠标/触摸拖拽和键盘操作
   const sensors = useSensors(
+    // 指针传感器：检测鼠标/触摸拖拽，设置最小移动距离为 6px 避免误触发
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 6,
       },
     }),
+    // 键盘传感器：支持键盘方向键控制排序
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -328,7 +332,15 @@ const Layout = () => {
           {/* Custom titlebar - rendered only when decorated is false, memoized for performance */}
           {customTitlebar}
 
-          <div className="layout-content">
+          <div
+            className="layout-content"
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              height: "100%",
+              flexGrow: 1,
+            }}
+          >
             <div className="layout-content__left">
               <div className="the-logo" data-tauri-drag-region="false">
                 <div
