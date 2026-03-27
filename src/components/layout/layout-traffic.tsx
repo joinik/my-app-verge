@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { LightweightTrafficErrorBoundary } from "@/components/shared/traffic-error-boundary";
 import { useMemoryData } from "@/hooks/use-memory-data";
 import { useTrafficData } from "@/hooks/use-traffic-data";
-import { useVerge } from "@/hooks/useVerge";
+import { useVerge } from "@/hooks/use-verge";
 import { useVisibility } from "@/hooks/use-visibility";
 import parseTraffic from "@/utils/parse-traffic";
 

@@ -1,5 +1,5 @@
 import { Close, CropSquare, FilterNone, Minimize } from "@mui/icons-material";
-import { useWindowControls } from "@/hooks/useWindow";
+import { useWindowControls } from "@/hooks/use-window";
 import getSystem from "@/utils/get-system";
 import { Box, IconButton } from "@mui/material";
 import { forwardRef, useImperativeHandle } from "react";

@@ -3,7 +3,7 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { useEffect } from "react";
 import { mutate } from "swr";
 
-import { useListen } from "@/hooks/useListen";
+import { useListen } from "@/hooks/use-listen";
 import { isTauri } from "@/utils/tauri-env";
 
 export const useLayoutEvents = (

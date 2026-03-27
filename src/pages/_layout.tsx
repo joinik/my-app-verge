@@ -45,9 +45,9 @@ import { LayoutTraffic } from "@/components/layout/layout-traffic";
 import { NoticeManager } from "@/components/layout/notice-manager";
 import { UpdateButton } from "@/components/layout/update-button";
 import { WindowControls } from "@/components/layout/window-controller";
-import { useI18n } from "@/hooks/useI18n";
-import { useVerge } from "@/hooks/useVerge";
-import { useWindowDecorations } from "@/hooks/useWindow";
+import { useI18n } from "@/hooks/use-i18n";
+import { useVerge } from "@/hooks/use-verge";
+import { useWindowDecorations } from "@/hooks/use-window";
 import { useThemeMode } from "@/services/states";
 
 import getSystem from "@/utils/get-system";
@@ -481,15 +481,17 @@ const Layout = () => {
                 </MenuItem>
               </Menu>
 
-              <div className="the-traffic">{/* <LayoutTraffic /> */}</div>
+              <div className="the-traffic">
+                <LayoutTraffic />
+              </div>
             </div>
 
             <div className="layout-content__right">
               <div className="the-bar"></div>
               <div className="the-content">
-                {/* <BaseErrorBoundary> */}
-                <Outlet />
-                {/* </BaseErrorBoundary> */}
+                <BaseErrorBoundary>
+                  <Outlet />
+                </BaseErrorBoundary>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useVerge } from "@/hooks/useVerge";
+import { useVerge } from "@/hooks/use-verge";
 import { useSetThemeMode, useThemeMode } from "@/services/states";
 import { alpha, createTheme, Theme as MuiTheme, Shadows } from "@mui/material";
 import { useEffect, useMemo } from "react";

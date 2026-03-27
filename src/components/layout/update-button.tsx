@@ -2,7 +2,7 @@ import { Button } from "@mui/material";
 import { useRef } from "react";
 import useSWR from "swr";
 
-import { useVerge } from "@/hooks/useVerge";
+import { useVerge } from "@/hooks/use-verge";
 import { checkUpdateSafe } from "@/services/update";
 
 import { DialogRef } from "../base";
