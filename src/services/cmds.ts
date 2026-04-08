@@ -26,9 +26,9 @@ export const copyClashEnv = async () => {
 export const getProfiles = async () => {
   // 如果在浏览器环境中，直接返回默认值
   if (!isTauri()) {
-    return [] as IProfilesConfig[];
+    return null;
   }
-  return invoke<IProfilesConfig[]>("get_profiles");
+  return invoke<IProfilesConfig>("get_profiles");
 };
 export const enhanceProfiles = async () => {
   return invoke<void>("enhance_profiles");
