@@ -16,7 +16,15 @@ name = "my_new_app_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [features]
-default = []
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]
+verge-dev = ["clash_verge_logger/color"]
+tauri-dev = ["clash-verge-logging/tauri-dev"]
+tokio-trace = ["console-subscriber"]
+clippy = ["tauri/test"]
+tracing = []
+tracing-full = []
+
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
