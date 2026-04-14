@@ -334,48 +334,83 @@ pub struct ClashInfo {
     pub port: Option<u16>,
     /// SOCKS5端口
     pub socks_port: Option<u16>,
-    /// 允许局域网    
-    pub allow_lan: Option<bool>,
-    /// 日志级别
-    pub log_level: Option<String>,
-    /// 外部控制器
-    pub external_controller: Option<String>,
-    /// IPv6 支持
-    pub ipv6: Option<bool>,
-    /// DNS 设置
-    pub dns: Option<DnsConfig>,
-    /// 代理配置
-    pub proxies: Option<YamlValue>,
-    /// 代理组
-    pub proxy_groups: Option<YamlValue>,
-    /// 规则
-    pub rules: Option<Vec<YamlValue>>,
+    /// 密钥
+    pub secret: Option<String>,
+    pub server: String,
 }
 
-/// DNS 配置
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[allow(dead_code)]
-pub struct DnsConfig {
-    pub enable: Option<bool>,
-    pub nameserver: Option<Vec<String>>,
-    pub nameserver_policy: Option<YamlValue>,
-    pub fallback: Option<Vec<String>>,
-    pub fallback_policy: Option<YamlValue>,
+#[test]
+fn test_clash_info() {
+    fn get_case<T: Into<Value>, D: Into<Value>>(mp: T, ec: D) -> ClashInfo {
+        let mut map = Mapping::new();
+        map.insert("mixed-port".into(), mp.into());
+        map.insert("external-controller".into(), ec.into());
+
+        IClashTemp(IClashTemp::guard(map)).get_client_info()
+    }
+
+    fn get_result<S: Into<String>>(port: u16, server: S) -> ClashInfo {
+        ClashInfo {
+            mixed_port: port,
+            socks_port: 7898,
+            port: 7899,
+            server: server.into(),
+            secret: None,
+        }
+    }
+
+    assert_eq!(
+        IClashTemp(IClashTemp::guard(Mapping::new())).get_client_info(),
+        get_result(7897, "127.0.0.1:9097")
+    );
+
+    assert_eq!(get_case("", ""), get_result(7897, "127.0.0.1:9097"));
+
+    assert_eq!(get_case(65537, ""), get_result(1, "127.0.0.1:9097"));
+
+    assert_eq!(get_case(8888, "127.0.0.1:8888"), get_result(8888, "127.0.0.1:8888"));
+
+    assert_eq!(get_case(8888, "   :98888 "), get_result(8888, "127.0.0.1:9097"));
+
+    assert_eq!(get_case(8888, "0.0.0.0:8080  "), get_result(8888, "127.0.0.1:8080"));
+
+    assert_eq!(get_case(8888, "0.0.0.0:8080"), get_result(8888, "127.0.0.1:8080"));
+
+    assert_eq!(get_case(8888, "[::]:8080"), get_result(8888, "127.0.0.1:8080"));
+
+    assert_eq!(get_case(8888, "192.168.1.1:8080"), get_result(8888, "192.168.1.1:8080"));
+
+    assert_eq!(get_case(8888, "192.168.1.1:80800"), get_result(8888, "127.0.0.1:9097"));
 }
 
 /// Clash 配置管理器
-#[derive(Debug)]
-#[allow(dead_code)]
-pub struct ClashConfig {
-    /// 配置数据
-    data: ArcSwap<ClashConfigData>,
-    /// 配置文件路径
-    path: PathBuf,
-    /// 最后修改时间
-    pub last_update: Option<DateTime<Local>>,
+#[derive(Debug, Clone, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub struct IClashExternalControllerCors {
+    pub allow_origins: Option<Vec<String>>,
+    pub allow_private_network: Option<bool>,
 }
 
-impl ClashConfig {
+#[derive(Debug, Clone, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub struct IClash {
+
+    pub enable: Option<bool>,
+    pub listen: Option<String>,
+    pub default_nameserver: Option<Vec<String>>,
+    pub enhanced_mode: Option<String>,
+    pub fake_ip_range: Option<String>,
+    pub use_hosts: Option<bool>,
+    pub fake_ip_filter: Option<Vec<String>>,
+    pub nameserver: Option<Vec<String>>,
+    pub fallback: Option<Vec<String>>,
+    pub fallback_filter: Option<IClashFallbackFilter>,
+    pub nameserver_policy: Option<Vec<String>>,
+
+
+
+
+    #=====================================todo===============================
     #[allow(dead_code)]
     pub fn new() -> Self {
         Self {
@@ -477,8 +512,11 @@ impl ClashConfig {
     }
 }
 
-impl Default for ClashConfig {
-    fn default() -> Self {
-        Self::new()
-    }
+#[derive(Debug, Clone, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "kebab-case")]
+pub struct IClashFallbackFilter {
+    pub ipcidr: Option<Vec<String>>,
+    pub domain: Option<Vec<String>>,
+    pub geoip: Option<bool>,
+    pub geoip_code: Option<Vec<String>>,
 }
