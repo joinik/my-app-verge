@@ -16,4 +16,4 @@ This template should help get you started developing with Tauri, React and Types
 
 ## License
 
-GPL-3.0 License. See [License here](https://github.com/clash-verge-rev/clash-verge-rev/blob/dev/LICENSE) for details.
+GPL-3.0 License. See [License here](https://github.com/joinik/my-app-verge/blob/main/LICENSE) for details.
