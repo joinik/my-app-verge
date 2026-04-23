@@ -7,7 +7,7 @@ members = [
   "crates/my-app-signal",
 
 
-  "src-tauri", 
+  "src-tauri", "crates/tauri-plugin-my-app-sysinfo", 
 ]
 
 resolver = "2"

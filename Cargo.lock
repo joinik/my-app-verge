@@ -4538,7 +4538,7 @@ dependencies = [
  "serde_json",
  "serde_yaml_ng",
  "smartstring",
- "sysinfo",
+ "sysinfo 0.38.4",
  "sysproxy",
  "tauri",
  "tauri-build",
@@ -5808,7 +5808,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "27c6023962132f4b30eb4c172c91ce92d933da334c59c23cddee82358ddafb0b"
 dependencies = [
  "anyhow",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "proc-macro2",
  "quote",
  "syn 2.0.117",
@@ -7517,6 +7517,20 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
+version = "0.37.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16607d5caffd1c07ce073528f9ed972d88db15dd44023fa57142963be3feb11f"
+dependencies = [
+ "libc",
+ "memchr",
+ "ntapi",
+ "objc2-core-foundation",
+ "objc2-io-kit",
+ "windows 0.61.3",
+]
+
+[[package]]
+name = "sysinfo"
 version = "0.38.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "92ab6a2f8bfe508deb3c6406578252e491d299cbbf3bc0529ecc3313aee4a52f"
@@ -7811,6 +7825,18 @@ dependencies = [
  "tauri",
  "tauri-plugin",
  "thiserror 2.0.18",
+]
+
+[[package]]
+name = "tauri-plugin-clash-verge-sysinfo"
+version = "0.1.0"
+dependencies = [
+ "deelevate",
+ "libc",
+ "parking_lot",
+ "sysinfo 0.37.2",
+ "tauri",
+ "tauri-plugin-clipboard-manager",
 ]
 
 [[package]]
