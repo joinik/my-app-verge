@@ -41,7 +41,7 @@ impl<T: Clone> Draft<T> {
     where
         F: FnOnce(&mut T) -> R,
     {
-        let mut guard = self.inner.write();
+        let mut guard = self.inner.write().unwrap();
         let mut draft_arc = guard.1.take().unwrap_or_else(|| Arc::clone(&guard.0));
         let data_mut = Arc::make_mut(&mut draft_arc);
         let result = f(data_mut);

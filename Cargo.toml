@@ -3,6 +3,7 @@ members = [
   "crates/my-app-types",
   "crates/my-app-logging",
   "crates/my-app-draft",
+  "crates/my-app-i18n",
   "src-tauri",
 ]
 
@@ -41,9 +42,8 @@ strip = false
 [workspace.dependencies]
 my-app-logging = { path = "crates/my-app-logging" }
 my-app-types = { path = "crates/my-app-types" }
-my-app-draft = {
-  path = "crates/my-app-draft"
-}
+my-app-draft = { path = "crates/my-app-draft" }
+my-app-i18n = { path = "crates/my-app-i18n" }
 
 tauri = {version = "2.10.3"}
 tauri-plugin-clipboard-manager = "2.3.2"
