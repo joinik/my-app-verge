@@ -1192,6 +1192,7 @@ dependencies = [
  "compact_str",
  "flexi_logger",
  "log",
+ "nu-ansi-term",
  "tokio",
 ]
 
@@ -4387,6 +4388,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "my-app-logging"
+version = "0.1.0"
+dependencies = [
+ "compact_str",
+ "flexi_logger",
+ "log",
+ "tokio",
+]
+
+[[package]]
+name = "my-app-types"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_yaml_ng",
+ "smartstring",
+]
+
+[[package]]
 name = "my-new-app"
 version = "0.1.0"
 dependencies = [
@@ -4416,6 +4436,7 @@ dependencies = [
  "getrandom 0.3.4",
  "governor",
  "log",
+ "my-app-logging",
  "nanoid",
  "network-interface",
  "once_cell",

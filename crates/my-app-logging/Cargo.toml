@@ -1,0 +1,18 @@
+[package]
+name = "my-app-logging"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+log = { workspace = true }
+tokio = { workspace = true }
+compact_str = { workspace = true }
+flexi_logger = { workspace = true }
+
+
+[features]
+default = []
+tauri-dev = []
+
+[lints]
+workspace = true

@@ -1,6 +1,8 @@
 [workspace]
 members = [
-    "src-tauri",
+  "crates/my-app-types",
+  "crates/my-app-logging",
+  "src-tauri",
 ]
 
 resolver = "2"
@@ -36,6 +38,9 @@ debug = true
 strip = false
 
 [workspace.dependencies]
+my-app-logging = { path = "crates/my-app-logging" }
+my-app-types = { path = "crates/my-app-types" }
+
 tauri = {version = "2.10.3"}
 tauri-plugin-clipboard-manager = "2.3.2"
 
