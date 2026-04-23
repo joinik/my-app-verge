@@ -1,3 +1,13 @@
+use compact_str::CompactString;
+use flexi_logger::filter::LogLineFilter;
+use flexi_logger::writers::FileLogWriter;
+use flexi_logger::writers::LogWriter as _;
+use flexi_logger::{DeferredNow, writers::LogWriter};
+use log::{Level, Record};
+#[cfg(not(feature = "tauri-dev"))]
+use std::{fmt, sync::Arc};
+use tokio::sync::{Mutex, MutexGuard};
+
 pub type SharedWriter = Arc<Mutex<FileLogWriter>>;
 
 #[derive(Debug, PartialEq, Eq)]
@@ -52,7 +62,7 @@ impl fmt::Display for Type {
 #[macro_export]
 macro_rules! logging {
     // 不带 print 参数的版本 （默认不打印）
-    ($level:ident, $type:expr, $($arg::tt)*) =>{
+    ($level:ident, $type:expr, $($arg:tt)*) =>{
         log::$level!(target:"app", "{} {}", $type, format_args!($($arg)*));
     }
 }
@@ -104,8 +114,11 @@ pub fn write_sidecar_log(
     let _ = writer.write(now, &record);
 }
 
-#[cfg(not(feature = "taurio-dev"))]
-impl<'a> NoModeleFilter<'a> {
+#[cfg(not(feature = "tauri-dev"))]
+pub struct NoModuleFilter<'a>(pub &'a [&'a str]);
+
+#[cfg(not(feature = "tauri-dev"))]
+impl<'a> NoModuleFilter<'a> {
     #[inline]
     pub fn filter(&self, record: &Record) -> bool {
         if let Some(module) = record.module_path() {
@@ -119,21 +132,18 @@ impl<'a> NoModeleFilter<'a> {
     }
 }
 
-#[cfg(not(feature = "taurio-dev"))]
-impl<'a> LogLineFilter for NoModeleFilter<'a> {
+#[cfg(not(feature = "tauri-dev"))]
+impl<'a> LogLineFilter for NoModuleFilter<'a> {
     #[inline]
     fn write(
-        &self, 
-        now: &mut DeferredNow, 
+        &self,
+        now: &mut DeferredNow,
         record: &Record,
-        writer: &dyn,
-        flexi_logger::filter::LogLineWriter,
-    ) -> std::io::Result<()>{
+        writer: &dyn flexi_logger::filter::LogLineWriter,
+    ) -> std::io::Result<()> {
         if !self.filter(record) {
             return Ok(());
         }
         writer.write(now, record)
     }
 }
-
-
