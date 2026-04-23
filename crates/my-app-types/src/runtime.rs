@@ -1,9 +1,6 @@
-use std::{
-    collections::{HashMap, HashSet},
-    future::pending,
-};
+use std::collections::{HashMap, HashSet};
 
-use serde_yaml_ng::Mapping;
+use serde_yaml_ng::{Mapping, Value};
 
 const PATCH_CONFIG_INNER: [&str; 4] = ["allow-lan", "ipv6", "unified-delay", "log-level"];
 
@@ -17,7 +14,7 @@ pub struct IRuntime {
     pub chain_logs: HashMap<String, Vec<(String, String)>>,
 }
 
-impl IRIRuntime {
+impl IRuntime {
     #[inline]
     pub fn new() -> Self {
         Self::default()
@@ -49,13 +46,13 @@ impl IRIRuntime {
             if let Some(patch_tun_mapping) = patch_tun_value.as_mapping() {
                 for key in use_keys(patch_tun_mapping) {
                     if let Some(value) = patch_tun_mapping.get(key.as_str()) {
-                        tun.insert(key.as_str(), value.clone());
+                        tun.insert(Value::from(key.as_str()), value.clone());
                     }
                 }
             }
 
             config.insert("tun".into(), tun.into());
-            config.insert("tun".into(), Value::from(tun));
+            // config.insert("tun".into(), Value::from(tun));
         }
     }
 }

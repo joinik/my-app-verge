@@ -323,7 +323,6 @@ impl IClashTemp {
     }
 }
 
-)]
 
 /// Clash 核心配置结构
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]

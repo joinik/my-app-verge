@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "WebFetch(raw.githubusercontent.com)",
-      "Bash(ls *)"
-    ]
-  },
-  "$version": 3
-}

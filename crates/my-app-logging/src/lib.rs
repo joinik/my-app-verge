@@ -1,10 +1,11 @@
 use compact_str::CompactString;
+use flexi_logger::DeferredNow;
+#[cfg(not(feature = "tauri-dev"))]
 use flexi_logger::filter::LogLineFilter;
 use flexi_logger::writers::FileLogWriter;
 use flexi_logger::writers::LogWriter as _;
-use flexi_logger::{DeferredNow, writers::LogWriter};
-use log::{Level, Record};
-#[cfg(not(feature = "tauri-dev"))]
+use log::Level;
+use log::Record;
 use std::{fmt, sync::Arc};
 use tokio::sync::{Mutex, MutexGuard};
 

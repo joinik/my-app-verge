@@ -4388,6 +4388,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "my-app-draft"
+version = "0.1.0"
+
+[[package]]
 name = "my-app-logging"
 version = "0.1.0"
 dependencies = [
