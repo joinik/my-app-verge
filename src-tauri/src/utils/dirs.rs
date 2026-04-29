@@ -202,3 +202,55 @@ pub fn init_portable_flag() -> Result<()> {
     PORTABLE_FLAG.get_or_init(|| false);
     Ok(())
 }
+
+
+
+#[cfg(unix)]
+pub fn ensure_mihomo_safe_dir() -> Option<PathBuf> {
+    iter::once("/tmp")
+        .map(PathBuf::from)
+        .find(|path| path.exists())
+        .or_else(|| {
+            std::env::var_os("HOME").and_then(|home| {
+                let home_config = PathBuf::from(home).join(".config");
+                if home_config.exists() || fs::create_dir_all(&home_config).is_ok() {
+                    Some(home_config)
+                } else {
+                    logging!(error, Type::File, "Failed to create safe directory: {home_config:?}");
+                    None
+                }
+            })
+        })
+}
+
+#[cfg(unix)]
+pub fn ipc_path() -> Result<PathBuf> {
+    ensure_mihomo_safe_dir()
+        .map(|base_dir| base_dir.join("verge").join("verge-mihomo.sock"))
+        .or_else(|| {
+            app_home_dir()
+                .ok()
+                .map(|dir| dir.join("verge").join("verge-mihomo.sock"))
+        })
+        .ok_or_else(|| anyhow::anyhow!("Failed to determine ipc path"))
+}
+
+#[cfg(target_os = "windows")]
+pub fn ipc_path() -> Result<PathBuf> {
+    Ok(PathBuf::from(r"\\.\pipe\verge-mihomo"))
+}
+#[async_trait]
+pub trait PathBufExec {
+    async fn remove_if_exists(&self) -> Result<()>;
+}
+
+#[async_trait]
+impl PathBufExec for PathBuf {
+    async fn remove_if_exists(&self) -> Result<()> {
+        if self.exists() {
+            tokio::fs::remove_file(self).await?;
+            logging!(info, Type::File, "Removed file: {:?}", self);
+        }
+        Ok(())
+    }
+}
