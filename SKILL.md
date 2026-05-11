@@ -1691,3 +1691,77 @@ A3: 使用 ArcSwap 减少内存复制，及时释放不需要的资源。
 - [ ] 性能满足要求
 - [ ] 文档完整
 - [ ] 代码风格一致
+
+## 与clash-Verge-Rev设计对比
+
+### 管理器模式（传统）
+
+`ClashConfig` / `AppConfig` / `Profiles` 等结构体采用典型的管理器模式：
+
+```rust
+pub struct ClashConfig {
+    data: ArcSwap<ClashConfigData>,
+    path: PathBuf,
+}
+
+impl ClashConfig {
+    pub fn set_mixed_port(&self, port: u16) {
+        let mut data = (*self.data.load()).clone();
+        data.mixed_port = Some(port);
+        self.data.store(Arc::new(data));
+    }
+
+    pub fn get_mixed_port(&self) -> u16 {
+        self.data.load().mixed_port.unwrap_or(7890)
+    }
+}
+```
+
+- 数据与操作**耦合**在同一个 struct 中
+- 每个修改方法都要手动重复 `load → clone → modify → store`
+- 跨 `.await` 不安全，需小心持有锁
+- 没有并发冲突检测
+
+### Draft + `with_data_modify` 模式（新设计）
+
+`IProfiles` 是纯数据结构体，`Draft` 负责并发控制：
+
+```rust
+pub struct IProfiles {
+    pub current: Option<String>,
+    pub items: Option<Vec<PrfItem>>,
+}  // 纯数据，无方法
+
+pub async fn profiles_update_item_safe(index: &String, item: &mut PrfItem) -> Result<()> {
+    Config::profiles()
+        .await
+        .with_data_modify(|mut profiles| async move {
+            profiles.update_item(index, item).await?;
+            Ok((profiles, ()))
+        })
+        .await
+}
+```
+
+- 数据与并发控制**分离**
+- 闭包拿到的是 owned value，天然安全跨 `.await`
+- **乐观锁**：写回时检查 `Arc` 指针是否被其他线程修改
+- **事务语义**：全有或全无，不会出现半修改状态
+
+### 核心区别对比
+
+| 维度           | 管理器模式                          | Draft + `with_data_modify`            |
+| -------------- | ----------------------------------- | ------------------------------------- |
+| **数据与操作** | 耦合（struct 方法直接修改内部状态） | **分离**（纯数据 + 函数式闭包）       |
+| **async 安全** | 需手动避免跨 `.await` 持锁          | **天然安全**（owned value，无锁）     |
+| **并发控制**   | 手动 `load→clone→modify→store`      | **乐观锁**（`Arc::ptr_eq` 检测冲突）  |
+| **事务性**     | 无                                  | 全有或全无，原子回滚                  |
+| **测试性**     | 依赖全局状态                        | 纯数据 + 纯函数，可独立测试           |
+| **草稿/提交**  | 无                                  | 支持 `edit_draft`、`apply`、`discard` |
+
+### 选型建议
+
+- **简单读写**（如 getter）：用管理器模式（`data_arc()` 零拷贝）
+- **复杂异步修改**（如更新订阅、写文件）：用 Draft `with_data_modify`（安全跨 `.await`）
+- **UI 编辑草稿**（用户改了但未保存）：用 Draft `edit_draft`（延迟拷贝 + 可丢弃）
+- **纯读 + 高性能**：直接用 `latest_arc()`（仅 clone Arc）

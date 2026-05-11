@@ -1,37 +1,19 @@
 use crate::{
     config::profiles,
     utils::{
-        dirs,
-        help,
+        dirs, help,
         network::{NetworkManager, ProxyType},
         tmpl,
     },
 };
 
-use std::{time::Duration};
 use anyhow::{Context, Result, anyhow, bail};
 use serde::{Deserialize, Serialize};
 use serde_yaml_ng::Mapping;
 use smartstring::alias::String;
+use std::time::Duration;
 use tokio::fs;
 
-
-/// 代理类型
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "lowercase")]
-#[allow(dead_code)]
-pub enum ProxyType {
-    Http,
-    Https,
-    Socks4,
-    Socks5,
-    Socks5T,
-    Trojan,
-    Vless,
-    Vmess,
-    Snell,
-    Obfs,
-}
 /// 单个代理配置
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct PrfItem {
@@ -77,8 +59,6 @@ pub struct PrfItem {
     /// profile file data
     #[serde(skip)]
     pub file_data: Option<String>,
-
-    
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
@@ -89,10 +69,10 @@ pub struct PrfSelected {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct PrfExtra {
-    pub upload: Option<u64>,
-    pub download: Option<u64>,
-    pub total: Option<u64>,
-    pub expire: Option<u64>,
+    pub upload: u64,
+    pub download: u64,
+    pub total: u64,
+    pub expire: u64,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -258,7 +238,7 @@ impl PrfItem {
     /// ## Remote type
     /// create a new item from url
     pub async fn from_url(
-        url:&str,
+        url: &str,
         name: Option<&String>,
         desc: Option<&String>,
         option: Option<&PrfOption>,
@@ -284,23 +264,25 @@ impl PrfItem {
         } else {
             ProxyType::None
         };
-    
 
-    let resp = match NetworkManager::new().get_with_interrupt(url, proxy_type, Some(timeout), user_agent.clone(),accept_invalid_certs).await{
-        Ok(r)=>r,
-        Err(e)=>{
-            tokio::time::sleep(Duration::from_millis(100)).await;
-             bail!("failed to fetch remote profile: {}", e);
-        }
-    }
+        let resp = match NetworkManager::new()
+            .get_with_interrupt(url, proxy_type, Some(timeout), user_agent.clone(), accept_invalid_certs)
+            .await
+        {
+            Ok(r) => r,
+            Err(e) => {
+                tokio::time::sleep(Duration::from_millis(100)).await;
+                bail!("failed to fetch remote profile: {}", e);
+            }
+        };
 
-    let status_code = resp.status();
-    if !status_code.is_success() {
-        bail!("failed to fetch remote profile: status code {}", status_code);
-    }
+        let status_code = resp.status();
+        if !status_code.is_success() {
+            bail!("failed to fetch remote profile: status code {}", status_code);
+        };
 
-    let header = resp.headers();
-    // parse the Subscription UserInfo
+        let header = resp.headers();
+        // parse the Subscription UserInfo
         let extra;
         'extra: {
             for (k, v) in header.iter() {
@@ -321,7 +303,7 @@ impl PrfItem {
                 }
             }
             extra = None;
-        }
+        };
 
         // parse the Content-Disposition
         let filename = match header.get("Content-Disposition") {
@@ -368,7 +350,7 @@ impl PrfItem {
         let name = name
             .map(|s| s.to_owned())
             .unwrap_or_else(|| filename.map(|s| s.into()).unwrap_or_else(|| "Remote File".into()));
-        let data = resp.text_with_charset()?;
+        let data = resp.body()?;
 
         // process the charset "UTF-8 with BOM"
         let data = data.trim_start_matches('\u{feff}');
@@ -570,9 +552,6 @@ impl PrfItem {
 const fn default_allow_auto_update() -> Option<bool> {
     Some(true)
 }
-
-
-
 
 //TODO 待删
 /// 路由规则类型

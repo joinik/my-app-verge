@@ -2,8 +2,9 @@
 #![recursion_limit = "512"]
 
 mod cmd;
-mod constants;
 mod config;
+mod constants;
+mod utils;
 
 use once_cell::sync::OnceCell;
 use tauri::{AppHandle, Manager as _};
@@ -31,8 +32,7 @@ mod app_init {
     }
 
     /// Generate command handlers
-    pub fn generate_handlers()
-    -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
+    pub fn generate_handlers() -> impl Fn(tauri::ipc::Invoke<tauri::Wry>) -> bool + Send + Sync + 'static {
         tauri::generate_handler![
             // app commands
             cmd::greet,
@@ -66,12 +66,10 @@ pub fn run() {
         })
         .invoke_handler(app_init::generate_handlers());
 
-    let app = builder
-        .build(tauri::generate_context!())
-        .unwrap_or_else(|e| {
-            println!("Failed to build Tauri application: {}", e);
-            std::process::exit(1);
-        });
+    let app = builder.build(tauri::generate_context!()).unwrap_or_else(|e| {
+        println!("Failed to build Tauri application: {}", e);
+        std::process::exit(1);
+    });
 
     app.run(|_app_handle, e| match e {
         tauri::RunEvent::Ready | tauri::RunEvent::Resumed => {

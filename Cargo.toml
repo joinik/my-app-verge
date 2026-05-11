@@ -5,9 +5,10 @@ members = [
   "crates/my-app-draft",
   "crates/my-app-i18n",
   "crates/my-app-signal",
+  "crates/tauri-plugin-clash-verge-sysinfo", 
 
 
-  "src-tauri", "crates/tauri-plugin-my-app-sysinfo", 
+  "src-tauri", 
 ]
 
 resolver = "2"
@@ -48,6 +49,7 @@ my-app-types = { path = "crates/my-app-types" }
 my-app-draft = { path = "crates/my-app-draft" }
 my-app-i18n = { path = "crates/my-app-i18n" }
 my-app-signal = { path = "crates/my-app-signal" }
+tauri-plugin-clash-verge-sysinfo = { path = "crates/tauri-plugin-clash-verge-sysinfo" }
 
 tauri = {version = "2.10.3"}
 tauri-plugin-clipboard-manager = "2.3.2"
@@ -64,7 +66,7 @@ tokio = { version = "1.48.0", features = [
 flexi_logger = "0.31.7"
 log = "0.4.29"
 
-smartstring = { version = "1.0.1" }
+smartstring = { version = "1.0.1", features = ["serde"] }
 compact_str = { version = "0.9.0", features = ["serde"] }
 
 serde = { version = "1.0.228" }

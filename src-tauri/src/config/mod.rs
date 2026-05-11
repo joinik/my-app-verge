@@ -1,22 +1,13 @@
-use arc_swap::ArcSwap;
-use once_cell::sync::Lazy;
-use std::sync::Arc;
-
-pub mod clash;
-pub mod config;
-pub mod encrypt;
-pub mod prfitem;
+mod clash;
+#[allow(clippy::module_inception)]
+mod config;
+mod encrypt;
+mod prfitem;
 pub mod profiles;
-pub mod verge;
+mod verge;
 
-#[allow(unused_imports)]
-pub use self::{
-    clash::ClashConfig,
-    profiles::Profiles,
-    verge::{AppConfig, VergeConfigData},
-};
+pub use self::{clash::*, config::*, encrypt::*, prfitem::*, profiles::*, verge::*};
 
-#[allow(dead_code)]
 pub const DEFAULT_PAC: &str = r#"function FindProxyForURL(url, host) {
   return "PROXY 127.0.0.1:%mixed-port%; SOCKS5 127.0.0.1:%mixed-port%; DIRECT;";
 }

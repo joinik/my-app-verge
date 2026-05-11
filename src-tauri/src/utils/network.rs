@@ -1,12 +1,14 @@
 use std::time::{Duration, Instant};
 
 use anyhow::Result;
-use base64::engine::general_purpose;
+
+use base64::{Engine as _, engine::general_purpose};
 use futures::lock::Mutex;
 use reqwest::{
     Client, Proxy, StatusCode,
     header::{HeaderMap, USER_AGENT},
 };
+use smartstring::alias::String;
 use sysproxy::Sysproxy;
 use tauri::{Url, http::HeaderValue};
 
@@ -31,7 +33,7 @@ impl HttpResponse {
         &self.headers
     }
 
-    pub const fn body(&self) -> Result<&String> {
+    pub fn body(&self) -> Result<&str> {
         Ok(&self.body)
     }
 }
@@ -69,7 +71,7 @@ impl NetworkManager {
     }
 
     async fn record_connection_error(&self, error: &str) {
-        *self.last_connection_error.lock().await = Some((Instant::now(), error.to_string()));
+        *self.last_connection_error.lock().await = Some((Instant::now(), error.into()));
         let mut count = self.connection_error_count.lock().await;
         *count += 1;
     }
@@ -222,7 +224,7 @@ impl NetworkManager {
 
         let response = match request_builder.send().await {
             Ok(response) => response,
-            Err(error) => {
+            Err(e) => {
                 self.record_connection_error(&format!("Request failed: {}", e)).await;
                 return Err(anyhow::anyhow!("Request failed: {}", e));
             }

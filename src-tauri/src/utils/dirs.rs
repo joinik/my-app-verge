@@ -1,12 +1,13 @@
+use crate::core::{CoreManager, handle, manager::RunningMode};
 use anyhow::Result;
-use my_app_logging::logging;
+use async_trait::async_trait;
+use my_app_logging::{Type, logging};
 use once_cell::sync::OnceCell;
 
 #[cfg(unix)]
 use std::iter;
 use std::{fs, path::PathBuf};
 use tauri::Manager as _;
-
 
 #[cfg(not(feature = "verge-dev"))]
 pub static APP_ID: &str = "io.github.clash-verge-rev.clash-verge-rev";
@@ -23,7 +24,6 @@ pub static PORTABLE_FLAG: OnceCell<bool> = OnceCell::new();
 pub static CLASH_CONFIG: &str = "config.yaml";
 pub static VERGE_CONFIG: &str = "verge.yaml";
 pub static PROFILE_YAML: &str = "profiles.yaml";
-
 
 /// get the resources dir
 pub fn app_resources_dir() -> Result<PathBuf> {
@@ -89,7 +89,6 @@ pub fn clash_path() -> Result<PathBuf> {
     Ok(app_home_dir()?.join(CLASH_CONFIG))
 }
 
-
 pub fn verge_path() -> Result<PathBuf> {
     Ok(app_home_dir()?.join(VERGE_CONFIG))
 }
@@ -97,7 +96,6 @@ pub fn verge_path() -> Result<PathBuf> {
 pub fn profiles_path() -> Result<PathBuf> {
     Ok(app_home_dir()?.join(PROFILE_YAML))
 }
-
 
 #[cfg(target_os = "macos")]
 pub fn service_path() -> Result<PathBuf> {
@@ -130,11 +128,9 @@ pub fn clash_latest_log() -> Result<PathBuf> {
     }
 }
 
-
 pub fn path_to_str(path: &PathBuf) -> Result<&str> {
-     path.to_str()
+    path.to_str()
         .ok_or_else(|| anyhow::anyhow!("Path contains non-UTF-8 characters: {:?}", path))
-
 }
 
 pub fn get_encryption_key() -> Result<Vec<u8>> {
@@ -164,7 +160,7 @@ pub fn app_home_dir() -> Result<PathBuf> {
 
     let flag = PORTABLE_FLAG.get().unwrap_or(&false);
     if *flag {
-        let app_exe = current_exe();
+        let app_exe = current_exe()?;
         let app_exe = dunce::canonicalize(app_exe)?;
 
         let app_dir = app_exe
@@ -177,15 +173,13 @@ pub fn app_home_dir() -> Result<PathBuf> {
     let app_handle = handle::Handle::app_handle();
 
     match app_handle.path().data_dir() {
-        Ok(dir) =>Ok(dir.join(APP_ID))
-        Err(e) =>{
+        Ok(dir) => Ok(dir.join(APP_ID)),
+        Err(e) => {
             logging!(error, Type::File, "Failed to get the app home directory: {e}");
             Err(anyhow::anyhow!("Failed to get the app homedirectory"))
         }
     }
-
 }
-
 
 /// init portable flag
 pub fn init_portable_flag() -> Result<()> {
@@ -202,8 +196,6 @@ pub fn init_portable_flag() -> Result<()> {
     PORTABLE_FLAG.get_or_init(|| false);
     Ok(())
 }
-
-
 
 #[cfg(unix)]
 pub fn ensure_mihomo_safe_dir() -> Option<PathBuf> {

@@ -184,6 +184,8 @@ impl IClashTemp {
 
     #[cfg(not(target_os = "windows"))]
     pub fn guard_redir_port(config: &Mapping) -> u16 {
+        use serde_json::Value;
+
         let mut port = config
             .get("redir-port")
             .and_then(|value| match value {
